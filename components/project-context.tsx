@@ -1,9 +1,14 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { createContext, useContext, useState } from "react"
+import type React from "react";
+import { createContext, useContext, useState } from "react";
 
-export type UserRole = "sales" | "admin" | "manager" | "supervisor" | "technician"
+export type UserRole =
+  | "sales"
+  | "admin"
+  | "manager"
+  | "supervisor"
+  | "technician";
 
 export type ProjectStatus =
   | "draft"
@@ -15,35 +20,38 @@ export type ProjectStatus =
   | "completed"
   | "done"
   | "cancelled"
-  | "pending"
+  | "pending";
 
 export interface Project {
-  id: string
-  title: string
-  client: string
-  description: string
-  status: ProjectStatus
-  createdBy: string
-  assignedTechnicians?: string[]
-  scheduledDate?: string
-  progress?: number
-  report?: string
-  createdAt: string
-  updatedAt: string
+  id: string;
+  title: string;
+  client: string;
+  description: string;
+  status: ProjectStatus;
+  createdBy: string;
+  assignedTechnicians?: string[];
+  scheduledDate?: string;
+  progress?: number;
+  report?: string;
+  progressNotes?: string; // Add this line
+  createdAt: string;
+  updatedAt: string;
 }
 
 interface ProjectContextType {
-  currentRole: UserRole
-  setCurrentRole: (role: UserRole) => void
-  projects: Project[]
-  addProject: (project: Omit<Project, "id" | "createdAt" | "updatedAt">) => void
-  updateProject: (id: string, updates: Partial<Project>) => void
+  currentRole: UserRole;
+  setCurrentRole: (role: UserRole) => void;
+  projects: Project[];
+  addProject: (
+    project: Omit<Project, "id" | "createdAt" | "updatedAt">
+  ) => void;
+  updateProject: (id: string, updates: Partial<Project>) => void;
 }
 
-const ProjectContext = createContext<ProjectContextType | undefined>(undefined)
+const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: React.ReactNode }) {
-  const [currentRole, setCurrentRole] = useState<UserRole>("sales")
+  const [currentRole, setCurrentRole] = useState<UserRole>("sales");
   const [projects, setProjects] = useState<Project[]>([
     {
       id: "1",
@@ -78,25 +86,29 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
       createdAt: "2024-01-20",
       updatedAt: "2024-01-20",
     },
-  ])
+  ]);
 
-  const addProject = (projectData: Omit<Project, "id" | "createdAt" | "updatedAt">) => {
+  const addProject = (
+    projectData: Omit<Project, "id" | "createdAt" | "updatedAt">
+  ) => {
     const newProject: Project = {
       ...projectData,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-    }
-    setProjects((prev) => [...prev, newProject])
-  }
+    };
+    setProjects((prev) => [...prev, newProject]);
+  };
 
   const updateProject = (id: string, updates: Partial<Project>) => {
     setProjects((prev) =>
       prev.map((project) =>
-        project.id === id ? { ...project, ...updates, updatedAt: new Date().toISOString() } : project,
-      ),
-    )
-  }
+        project.id === id
+          ? { ...project, ...updates, updatedAt: new Date().toISOString() }
+          : project
+      )
+    );
+  };
 
   return (
     <ProjectContext.Provider
@@ -110,13 +122,13 @@ export function ProjectProvider({ children }: { children: React.ReactNode }) {
     >
       {children}
     </ProjectContext.Provider>
-  )
+  );
 }
 
 export function useProject() {
-  const context = useContext(ProjectContext)
+  const context = useContext(ProjectContext);
   if (context === undefined) {
-    throw new Error("useProject must be used within a ProjectProvider")
+    throw new Error("useProject must be used within a ProjectProvider");
   }
-  return context
+  return context;
 }
